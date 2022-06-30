@@ -19,6 +19,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Persistence;
+using FluentValidation.AspNetCore;
 
 namespace API
 {
@@ -35,10 +36,15 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(opt =>
+            services.
+                AddControllers(opt =>
             {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 opt.Filters.Add(new AuthorizeFilter(policy));
+            })
+                .AddFluentValidation(config => 
+            {
+                config.RegisterValidatorsFromAssemblyContaining<Create>();
             });
 
             services.AddApplicationServices(_config);
